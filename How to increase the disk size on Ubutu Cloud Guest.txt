@@ -49,8 +49,11 @@ Format specific information:
 
 Note: since I didn't have to move the image to any other directory for KVM's use (in my case GNS3)I stopped after above procedures. In actual KVM you may have to move the file to somewhere like: /var/lib/libvirt/images
 
-Powered up the image in GNS3, saw some errors about SSH keys, but I can deal with it later. 
-The image works fine and shows the new resized disk-note the size of /dev/vda1
+Powered up the image in GNS3, saw some errors about SSH keys. I also could not ssh into devices since it complained about missing ciphers offered by the router or switch. 
+My issue was that the ciphers were missing in sshd_config file. 
+so, go to /etc/ssh/sshd_config
+and add the ciphers:
+Ciphers aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc
 
 root@ubuntu:~# fdisk -l
 Disk /dev/vda: 10 GiB, 10737418240 bytes, 20971520 sectors
