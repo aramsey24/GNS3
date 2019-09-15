@@ -1,0 +1,66 @@
+
+The default Virtual disk size in Ubuntu's cloud image is quite small: 2.2G. I was constantly running out of space in /dev/vda1 after installing Python packages/modules/libs/files. 
+
+This is the procedure I used in GNS3 VM (Workstation Pro) to resize the virtual disk size: 
+
+in Workstation Pro go to the Shell Command/Console
+cd to opt/gns3/images/QEMU
+
+ 
+Verify the virtual disk size before resizing: 
+
+ qemu-img info <filename-amd64>.img
+
+you should see somethig like: 
+
+image: ubuntu-18.04-server-cloudimg-amd64.img
+file format: qcow2
+virtual size: 2.2G (2361393152 bytes)
+disk size: 324M
+cluster_size: 65536
+Format specific information:
+    compat: 0.10
+    refcount bits: 16
+
+
+you can  increase the size by a set amount, ( +5G ) , or to a target size, ( 10G )
+The actual size should not change much. 
+
+
+$ qemu-img resize <filename-amd64>.img 10G
+     Image resized.   >you should see this message
+
+
+
+verify after resizing: 
+
+you should see: 
+
+$ qemu-img info ubuntu-18.04-server-cloudimg-amd64.img
+image: ubuntu-18.04-server-cloudimg-amd64.img
+file format: qcow2
+virtual size: 10G (10737418240 bytes)
+disk size: 324M
+cluster_size: 65536
+Format specific information:
+    compat: 0.10
+    refcount bits: 16
+
+
+Note: since I didn't have to move the image to any other directory for KVM's use (in my case GNS3)I stopped after above procedures. In actual KVM you may have to move the file to somewhere like: /var/lib/libvirt/images
+
+Powered up the image in GNS3, saw some errors about SSH keys, but I can deal with it later. 
+The image works fine and shows the new resized disk-note the size of /dev/vda1
+
+root@ubuntu:~# fdisk -l
+Disk /dev/vda: 10 GiB, 10737418240 bytes, 20971520 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 0E34F2CF-E596-4CC5-A048-72442450EF39
+
+Device      Start      End  Sectors  Size Type
+/dev/vda1  227328 20971486 20744159  9.9G Linux filesystem
+/dev/vda14   2048    10239     8192    4M BIOS boot
+/dev/vda15  10240   227327   217088  106M EFI System
